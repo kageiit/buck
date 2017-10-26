@@ -857,21 +857,13 @@
     <echo file="${build.dir}/classpath/classpaths">${classpaths}</echo>
   </target>
 
-  <target name="create-classpath-hash" depends="copy-resources, compile, dx, javac-plugin, report-generator-jar, create-classpath">
+  <target name="create-classpath-hash">
     <delete file="${buck.hash.file}"/>
-    <checksum todir="${build.dir}/checksums" totalproperty="buck.hash.value">
-      <fileset dir="${build.dir}">
-        <include name="${classes.dir.name}/**"/>
-        <include name="${manual.gensrc.classes.dir.name}/**"/>
-        <include name="${aosp.classes.dir.name}/**"/>
-        <include name="${dx.classes.dir.name}/**"/>
-        <include name="${tracing-api.classes.dir.name}/**"/>
-        <include name="${bootstrapper.classes.dir.name}/**"/>
-        <include name="${javac-plugin.classes.dir.name}/**"/>
-      </fileset>
-      <fileset refid="buck.jars"/>
-      <fileset refid="third-party.jars"/>
-    </checksum>
+    <exec executable="git" outputproperty="buck.hash.value">
+      <arg value="log" />
+      <arg value="-1" />
+      <arg value="--pretty=format:%H" />
+    </exec>
     <echo file="${buck.hash.file}">${buck.hash.value}</echo>
     <echo>Generated Buck hash: ${buck.hash.value}</echo>
   </target>

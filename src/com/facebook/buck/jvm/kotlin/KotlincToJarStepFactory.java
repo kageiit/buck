@@ -72,7 +72,6 @@ public class KotlincToJarStepFactory extends CompileToJarStepFactory implements 
   @AddToRuleKey private final ExtraClasspathProvider extraClassPath;
   @AddToRuleKey private final Javac javac;
   @AddToRuleKey private final JavacOptions javacOptions;
-  private final ImmutableSortedSet<Path> kotlinHomeLibraries;
 
   private static final String COMPILER_BUILTINS = "-Xadd-compiler-builtins";
   private static final String LOAD_BUILTINS_FROM = "-Xload-builtins-from-dependencies";
@@ -103,7 +102,6 @@ public class KotlincToJarStepFactory extends CompileToJarStepFactory implements 
 
   KotlincToJarStepFactory(
       Kotlinc kotlinc,
-      ImmutableSortedSet<Path> kotlinHomeLibraries,
       ImmutableList<String> extraKotlincArguments,
       ImmutableList<SourcePath> friendPaths,
       AnnotationProcessingTool annotationProcessingTool,
@@ -111,7 +109,6 @@ public class KotlincToJarStepFactory extends CompileToJarStepFactory implements 
       Javac javac,
       JavacOptions javacOptions) {
     this.kotlinc = kotlinc;
-    this.kotlinHomeLibraries = kotlinHomeLibraries;
     this.extraKotlincArguments = extraKotlincArguments;
     this.friendPaths = friendPaths;
     this.annotationProcessingTool = annotationProcessingTool;
@@ -180,7 +177,7 @@ public class KotlincToJarStepFactory extends CompileToJarStepFactory implements 
                   Optional.ofNullable(extraClassPath.getExtraClasspath())
                       .orElse(ImmutableList.of()))
               .addAll(declaredClasspathEntries)
-              .addAll(kotlinHomeLibraries)
+              .addAll(kotlinc.getHomeLibraries(buildContext.getSourcePathResolver()))
               .build();
 
       String friendPathsArg = getFriendsPath(buildContext.getSourcePathResolver(), friendPaths);
@@ -234,6 +231,7 @@ public class KotlincToJarStepFactory extends CompileToJarStepFactory implements 
               pathToSrcsList,
               allClasspaths,
               kotlinc,
+              kotlinc.getHomeLibraries(buildContext.getSourcePathResolver()),
               ImmutableList.<String>builder()
                   .addAll(extraKotlincArguments)
                   .add(friendPathsArg)
@@ -373,6 +371,7 @@ public class KotlincToJarStepFactory extends CompileToJarStepFactory implements 
                 .addAll(declaredClasspathEntries)
                 .build(),
             kotlinc,
+            kotlinc.getHomeLibraries(resolver),
             ImmutableList.<String>builder()
                 .addAll(extraKotlincArguments)
                 .add(friendPathsArg)
@@ -402,6 +401,7 @@ public class KotlincToJarStepFactory extends CompileToJarStepFactory implements 
                 .addAll(declaredClasspathEntries)
                 .build(),
             kotlinc,
+            kotlinc.getHomeLibraries(resolver),
             ImmutableList.<String>builder()
                 .addAll(extraKotlincArguments)
                 .add(friendPathsArg)

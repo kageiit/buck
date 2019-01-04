@@ -46,10 +46,10 @@ import com.facebook.buck.util.MoreSuppliers;
 import com.google.common.collect.ImmutableCollection;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSortedSet;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import java.util.Optional;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 import org.immutables.value.Value;
 
 /** Description for kotlin_test. */
@@ -62,6 +62,7 @@ public class KotlinTestDescription
   private final Supplier<JavaOptions> javaOptionsForTests;
   private final JavacFactory javacFactory;
   private final Supplier<JavacOptions> defaultJavacOptions;
+  private final KotlinConfiguredCompilerFactory compilerFactory;
 
   public KotlinTestDescription(
       ToolchainProvider toolchainProvider,
@@ -77,6 +78,8 @@ public class KotlinTestDescription
                 toolchainProvider
                     .getByName(JavacOptionsProvider.DEFAULT_NAME, JavacOptionsProvider.class)
                     .getJavacOptions());
+
+    this.compilerFactory = new KotlinConfiguredCompilerFactory(kotlinBuckConfig, javacFactory);
   }
 
   @Override
@@ -106,10 +109,9 @@ public class KotlinTestDescription
                 params,
                 graphBuilder,
                 context.getCellPathResolver(),
-                kotlinBuckConfig,
+                compilerFactory,
                 javaBuckConfig,
-                args,
-                javacFactory)
+                args)
             .setJavacOptions(javacOptions)
             .build();
 
@@ -137,7 +139,10 @@ public class KotlinTestDescription
         args.getContacts(),
         args.getTestType().orElse(TestType.JUNIT),
         javaOptionsForTests.get().getJavaRuntimeLauncher(graphBuilder),
-        Lists.transform(args.getVmArgs(), vmArg -> macrosConverter.convert(vmArg, graphBuilder)),
+        args.getVmArgs()
+            .stream()
+            .map(vmArg -> macrosConverter.convert(vmArg, graphBuilder))
+            .collect(Collectors.toList()),
         ImmutableMap.of(), /* nativeLibsEnvironment */
         args.getTestRuleTimeoutMs()
             .map(Optional::of)
@@ -165,6 +170,7 @@ public class KotlinTestDescription
       ImmutableCollection.Builder<BuildTarget> targetGraphOnlyDepsBuilder) {
     javacFactory.addParseTimeDeps(targetGraphOnlyDepsBuilder, constructorArg);
     javaOptionsForTests.get().addParseTimeDeps(targetGraphOnlyDepsBuilder);
+    compilerFactory.addTargetDeps(extraDepsBuilder, targetGraphOnlyDepsBuilder);
   }
 
   @BuckStyleImmutable

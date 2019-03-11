@@ -135,7 +135,10 @@ public class KotlinBuckConfig {
           if (compiler.isPresent()) {
             kotlinHome = compiler.get().toRealPath().getParent().normalize();
             if (kotlinHome != null && kotlinHome.endsWith(Paths.get("bin"))) {
-              kotlinHome = kotlinHome.getParent().normalize();
+              Path libExecpath = Paths.get(kotlinHome.toString(), "lib");
+              if (Files.isDirectory(libExecpath)) {
+                kotlinHome = libExecpath;
+              }
             }
           } else {
             throw new HumanReadableException(

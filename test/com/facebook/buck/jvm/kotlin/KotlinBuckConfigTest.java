@@ -43,7 +43,7 @@ public class KotlinBuckConfigTest {
     tmp.newFolder("faux_kotlin_home/bin");
     tmp.newFolder("faux_kotlin_home/libexec/bin");
     tmp.newFolder("faux_kotlin_home/libexec/lib");
-    tmp.newExecutableFile("faux_kotlin_home/kotlinc");
+    tmp.newExecutableFile("faux_kotlin_home/bin/kotlinc");
 
     testDataDirectory = tmp.getRoot();
   }
@@ -59,7 +59,7 @@ public class KotlinBuckConfigTest {
 
     buckConfig
         .getFilesystem()
-        .createNewFile(Paths.get("faux_kotlin_home/libexec/lib/kotlin-compiler-embeddable.jar"));
+        .createNewFile(Paths.get("faux_kotlin_home/lib/kotlin-compiler-embeddable.jar"));
 
     // WHEN
     KotlinBuckConfig kotlinBuckConfig = new KotlinBuckConfig(buckConfig);

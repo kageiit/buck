@@ -48,7 +48,7 @@ public class JarBackedReflectedKotlinc implements Kotlinc {
   private static final String COMPILER_CLASS = "org.jetbrains.kotlin.cli.jvm.K2JVMCompiler";
   private static final String EXIT_CODE_CLASS = "org.jetbrains.kotlin.cli.common.ExitCode";
 
-  private static final String FOLDER_PREFIX = "libexec/lib";
+  private static final String FOLDER_PREFIX = "lib";
 
   private static final String KOTLIN_ANNOTATION_PROCESSING =
       "kotlin-annotation-processing-gradle.jar";

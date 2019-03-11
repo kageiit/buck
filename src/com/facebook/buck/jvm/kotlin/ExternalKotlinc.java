@@ -18,7 +18,6 @@ package com.facebook.buck.jvm.kotlin;
 import com.facebook.buck.core.build.execution.context.ExecutionContext;
 import com.facebook.buck.core.exceptions.HumanReadableException;
 import com.facebook.buck.core.model.BuildTarget;
-import com.facebook.buck.core.rulekey.AddToRuleKey;
 import com.facebook.buck.core.rulekey.AddsToRuleKey;
 import com.facebook.buck.core.sourcepath.resolver.SourcePathResolver;
 import com.facebook.buck.io.filesystem.ProjectFilesystem;
@@ -73,17 +72,6 @@ public class ExternalKotlinc implements Kotlinc, AddsToRuleKey {
                 return KotlincVersion.of(output);
               }
             });
-  }
-
-  /** Returns the Kotlin version, or the path if version is unknown */
-  @AddToRuleKey
-  public String getKotlinCompilerVersion() {
-    if (DEFAULT_VERSION.equals(getVersion())) {
-      // What we really want to do here is use a VersionedTool, however, this will suffice for now.
-      return getShortName();
-    } else {
-      return getVersion().toString();
-    }
   }
 
   @Override
